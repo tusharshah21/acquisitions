@@ -1,7 +1,7 @@
 import logger from '#config/logger.js';
 import { users } from '#models/user.model.js';
 import bcrypt from 'bcrypt';
-import { db } from '../../database.js';
+import { db } from '#config/database.js';
 import { eq } from 'drizzle-orm';
 
 export const hashPassword = async password => {
@@ -38,7 +38,6 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
         email: users.email,
         role: users.role,
         created_at: users.created_at,
-        updated_at: users.updated_at,
       });
     logger.info(`Created new user: ${email} created successfully`);
     return newUser;
