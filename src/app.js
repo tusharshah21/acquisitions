@@ -11,6 +11,18 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Handle text/plain as JSON (for some API clients)
+app.use(express.text({ type: 'text/plain' }));
+app.use((req, res, next) => {
+  if (req.headers['content-type'] === 'text/plain' && typeof req.body === 'string') {
+    try {
+      req.body = JSON.parse(req.body);
+    } catch (e) {
+      // Not valid JSON, leave as string
+    }
+  }
+  next();
+});
 app.use(cookkieParser());
 app.use(
   morgan('combined', {
