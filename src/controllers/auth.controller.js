@@ -1,7 +1,8 @@
 import logger from '#config/logger.js';
 import { formatValidationsEroor } from '#validations/format.js';
 import { SignupSchema } from '#validations/auth.validation.js';
-import { createUser } from '#services/auth.service.js';
+import { createUser, authenticateUser } from '#services/auth.service.js';
+import { SignInSchema } from '#validations/auth.validation.js';
 import { jwttoken } from '#utils/jwt.js';
 import { cookies } from '#utils/cookies.js';
 
@@ -27,7 +28,12 @@ export const signup = async (req, res, next) => {
     logger.info(`User signed up: ${email} with role: ${role}`);
     res.status(201).json({
       message: 'User signed up successfully',
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
       token,
     });
   } catch (e) {
@@ -35,6 +41,56 @@ export const signup = async (req, res, next) => {
     if (e.message === 'User already exists') {
       return res.status(409).json({ error: e.message });
     }
+    next(e);
+  }
+};
+
+export const signin = async (req, res, next) => {
+  try {
+    const validationResult = SignInSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: formatValidationsEroor(validationResult.error),
+      });
+    }
+    const { email, password } = validationResult.data;
+    //AUTH Service
+    const user = await authenticateUser(email, password);
+    const token = jwttoken.sign({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    cookies.set(res, 'token', token);
+
+    logger.info(`User signed in: ${email}`);
+    res.status(200).json({
+      message: 'User signed in successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      token,
+    });
+  } catch (e) {
+    logger.error('Error in signin controller:', e);
+    if (e.message === 'User not found' || e.message === 'Invalid password') {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    next(e);
+  }
+};
+
+export const signout = async (req, res, next) => {
+  try {
+    cookies.clear(res, 'token');
+    logger.info('User signed out successfully');
+    res.status(200).json({ message: 'User signed out successfully' });
+  } catch (e) {
+    logger.error('Error in signout controller:', e);
     next(e);
   }
 };
