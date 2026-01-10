@@ -15,11 +15,15 @@ app.use(express.urlencoded({ extended: true }));
 // Handle text/plain as JSON (for some API clients)
 app.use(express.text({ type: 'text/plain' }));
 app.use((req, res, next) => {
-  if (req.headers['content-type'] === 'text/plain' && typeof req.body === 'string') {
+  if (
+    req.headers['content-type'] === 'text/plain' &&
+    typeof req.body === 'string'
+  ) {
     try {
       req.body = JSON.parse(req.body);
     } catch (e) {
-      // Not valid JSON, leave as string
+      logger.error('Error parsing text/plain body as JSON:', e);
+      return res.status(400).json({ error: 'Invalid JSON format' });
     }
   }
   next();
@@ -38,13 +42,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res
-    .status(200)
-    .json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    });
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
 });
 
 app.get('/api', (req, res) => {
