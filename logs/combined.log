@@ -80,3 +80,6 @@
 {"level":"info","message":"Created new user: test3@test.com created successfully","service":"acquisitions-api"}
 {"level":"info","message":"User signed up: test3@test.com with role: user","service":"acquisitions-api"}
 {"level":"info","message":"::1 - - [08/Jan/2026:11:36:31 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 311 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\"","service":"acquisitions-api"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [10/Jan/2026:08:01:35 +0000] \"GET /health HTTP/1.1\" 200 72 \"-\" \"-\"","service":"acquisitions-api"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [10/Jan/2026:08:01:35 +0000] \"GET /api HTTP/1.1\" 200 41 \"-\" \"-\"","service":"acquisitions-api"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [10/Jan/2026:08:01:35 +0000] \"GET /nonexistent HTTP/1.1\" 404 27 \"-\" \"-\"","service":"acquisitions-api"}
